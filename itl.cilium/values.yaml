@@ -1,0 +1,56 @@
+cilium:
+  k8sServiceHost: 10.99.100.10
+  k8sServicePort: 6443
+  kubeProxyReplacement: false
+
+  ipam:
+    mode: kubernetes
+
+  operator:
+    replicas: 1
+
+  # Talos mounts cgroup2 itself; Cilium must not try to mount it again.
+  cgroup:
+    autoMount:
+      enabled: false
+    hostRoot: /sys/fs/cgroup
+
+  # Talos blocks CAP_SYS_MODULE and CAP_SYS_BOOT node-wide (no pod may load
+  # kernel modules or reboot the host), but they're in Cilium's default
+  # capability set. Without this override, the cilium agent and its
+  # clean-cilium-state init container crash-loop with "unable to apply caps:
+  # can't apply capabilities: operation not permitted". See
+  # https://docs.siderolabs.com/talos/v1.14/learn-more/process-capabilities
+  securityContext:
+    capabilities:
+      ciliumAgent:
+        - CHOWN
+        - KILL
+        - NET_ADMIN
+        - NET_RAW
+        - IPC_LOCK
+        - SYS_ADMIN
+        - SYS_RESOURCE
+        - DAC_OVERRIDE
+        - FOWNER
+        - SETGID
+        - SETUID
+      cleanCiliumState:
+        - NET_ADMIN
+        - SYS_ADMIN
+        - SYS_RESOURCE
+
+  hubble:
+    enabled: true
+    relay:
+      enabled: true
+    ui:
+      enabled: true
+    metrics:
+      enabled:
+        - dns
+        - drop
+        - tcp
+        - flow
+        - icmp
+        - http

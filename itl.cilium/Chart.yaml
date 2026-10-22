@@ -1,0 +1,10 @@
+apiVersion: v2
+name: itl-cilium
+description: Cilium CNI for the ITL Talos cluster, wrapper chart around the upstream chart
+type: application
+version: 0.1.0
+appVersion: "1.17.6"
+dependencies:
+  - name: cilium
+    version: "1.17.6"
+    repository: "https://helm.cilium.io"
